@@ -271,6 +271,58 @@ to obtain UTXO for the sender, which is done by inspecting the last transaction
 
 You can inspect the transaction [here](https://www.blockchain.com/btc/tx/0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098)
 
+Examples below are shown for the BTC testnet, so make sure `bitcoind` is running as a testnet node.
+```bash
+btcio --rpc-endpoint=127.0.0.1:18332 \
+  utxo 72a49ff05829f6c31a089a9c7413498cb18190ffc839208e67a27cc15933a298 \
+  | jq '.'
+```
+```json
+{
+  "hex": "",
+  "txid": "72a49ff05829f6c31a089a9c7413498cb18190ffc839208e67a27cc15933a298",
+  "hash": "72a49ff05829f6c31a089a9c7413498cb18190ffc839208e67a27cc15933a298",
+  "size": 109,
+  "vsize": 109,
+  "weight": 436,
+  "version": 1,
+  "locktime": 0,
+  "vin": [
+    {
+      "coinbase": "04e10e4a4d0169062f503253482f",
+      "sequence": 4294967295
+    }
+  ],
+  "vout": [
+    {
+      "value": 50,
+      "n": 0,
+      "scriptPubKey": {
+        "asm": "02a741071164b40b01c4ad28913c4aa2a1015cc5b064f0c802272552f17ae08750 OP_CHECKSIG",
+        "hex": "2102a741071164b40b01c4ad28913c4aa2a1015cc5b064f0c802272552f17ae08750ac",
+        "type": "pubkey"
+      }
+    }
+  ]
+}
+```
+
+Based on this output the script can be obtained `2102a741071164b40b01c4ad28913c4aa2a1015cc5b064f0c802272552f17ae08750ac`
+and we also get to know the unspent amount in `value`
+
+## send transaction
+In order to send transaction you will need to know following:
+* previous transaction hash
+* script hex string
+* sender's private key in WIF format
+* receiver's address in compressed format
+* amount to send in sats
+```bash
+btcio send --amount=5000
+```
+
+The output is the transaction ID that can be used to verify it
+
 ## references
 * [Bitcoin API reference](https://developer.bitcoin.org/reference/rpc/index.html)
 * https://stackoverflow.com/questions/20481478/how-to-check-bitcoin-address-balance-from-my-application

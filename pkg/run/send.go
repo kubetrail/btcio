@@ -12,6 +12,8 @@ import (
 	"github.com/btcsuite/btcd/txscript"
 	"github.com/btcsuite/btcd/wire"
 	"github.com/btcsuite/btcutil"
+	"github.com/kubetrail/bip32/pkg/keys"
+	"github.com/kubetrail/bip39/pkg/prompts"
 	"github.com/kubetrail/btcio/pkg/flags"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,6 +29,7 @@ func Send(cmd *cobra.Command, args []string) error {
 	_ = viper.BindPFlag(flags.Key, cmd.Flag(flags.Key))
 	_ = viper.BindPFlag(flags.Addr, cmd.Flag(flags.Addr))
 	_ = viper.BindPFlag(flags.Amount, cmd.Flag(flags.Amount))
+	_ = viper.BindPFlag(flags.AllowHighFees, cmd.Flag(flags.AllowHighFees))
 
 	network := viper.GetString(flags.Network)
 	txHash := viper.GetString(flags.TransactionHash)
@@ -34,6 +37,7 @@ func Send(cmd *cobra.Command, args []string) error {
 	privKey := viper.GetString(flags.Key)
 	addr := viper.GetString(flags.Addr)
 	amount := viper.GetInt64(flags.Amount)
+	allowHighFees := viper.GetBool(flags.AllowHighFees)
 
 	var params chaincfg.Params
 	switch strings.ToLower(network) {
@@ -43,6 +47,63 @@ func Send(cmd *cobra.Command, args []string) error {
 		params = chaincfg.TestNet3Params
 	default:
 		return fmt.Errorf("invalid network, only mainnet or testnet are allowed")
+	}
+
+	prompt, err := prompts.Status()
+	if err != nil {
+		return fmt.Errorf("failed to get prompt status: %w", err)
+	}
+
+	if len(txHash) == 0 {
+		if prompt {
+			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "Enter previous tx hash: "); err != nil {
+				return fmt.Errorf("failed to write to output: %w", err)
+			}
+		}
+		txHash, err = keys.Read(cmd.InOrStdin())
+		if err != nil {
+			return fmt.Errorf("failed to read tx hash from input: %w", err)
+		}
+	}
+
+	if len(privKey) == 0 {
+		if prompt {
+			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "Enter priv WIF key: "); err != nil {
+				return fmt.Errorf("failed to write to output: %w", err)
+			}
+		}
+		privKey, err = keys.Read(cmd.InOrStdin())
+		if err != nil {
+			return fmt.Errorf("failed to read priv wif key from input: %w", err)
+		}
+	}
+
+	if len(pkScript) == 0 {
+		if prompt {
+			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "Enter pk script: "); err != nil {
+				return fmt.Errorf("failed to write to output: %w", err)
+			}
+		}
+		pkScript, err = keys.Read(cmd.InOrStdin())
+		if err != nil {
+			return fmt.Errorf("failed to read pk script from input: %w", err)
+		}
+	}
+
+	if len(addr) == 0 {
+		if prompt {
+			if _, err := fmt.Fprintf(cmd.OutOrStdout(), "Enter destination addr: "); err != nil {
+				return fmt.Errorf("failed to write to output: %w", err)
+			}
+		}
+		addr, err = keys.Read(cmd.InOrStdin())
+		if err != nil {
+			return fmt.Errorf("failed to read addr from input: %w", err)
+		}
+	}
+
+	if amount <= 0 {
+		return fmt.Errorf("amount needs to be a positive number of sats")
 	}
 
 	connCfg := &rpcclient.ConnConfig{
@@ -75,7 +136,7 @@ func Send(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to create a new transaction: %w", err)
 	}
 
-	chainHash, err := client.SendRawTransaction(newTx, false)
+	chainHash, err := client.SendRawTransaction(newTx, allowHighFees)
 	if err != nil {
 		return fmt.Errorf("failed to send raw transaction: %w", err)
 	}
@@ -125,6 +186,8 @@ type txConfig struct {
 	params   *chaincfg.Params
 }
 
+// CreateTx is based on examples provided at
+// https://medium.com/swlh/create-raw-bitcoin-transaction-and-sign-it-with-golang-96b5e10c30aa
 func CreateTx(config *txConfig) (*wire.MsgTx, error) {
 	// 1 or unit-amount in Bitcoin is equal to 1 satoshi and 1 Bitcoin = 100000000 satoshi
 
@@ -186,7 +249,14 @@ func SignTx(privKey string, pkScript string, redeemTx *wire.MsgTx) error {
 	// since there is only one input in our transaction
 	// we use 0 as second argument, if the transaction
 	// has more args, should pass related index
-	signature, err := txscript.SignatureScript(redeemTx, 0, sourcePKScript, txscript.SigHashAll, wif.PrivKey, true)
+	signature, err := txscript.SignatureScript(
+		redeemTx,
+		0,
+		sourcePKScript,
+		txscript.SigHashAll,
+		wif.PrivKey,
+		true,
+	)
 	if err != nil {
 		return nil
 	}

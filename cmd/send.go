@@ -44,4 +44,5 @@ func init() {
 	f.String(flags.Key, "", "Private WIF key")
 	f.String(flags.Addr, "", "Receiver addr")
 	f.Int64(flags.Amount, 0, "Amount to send (Sats)")
+	f.Bool(flags.AllowHighFees, false, "Allow high fees")
 }

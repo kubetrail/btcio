@@ -7,6 +7,7 @@ const (
 	OutputFormat        = "output-format"
 	Network             = "network"
 	TransactionHash     = "tx-hash"
+	AllowHighFees       = "allow-high-fees"
 	BlockHash           = "block-hash"
 	PkScriptNumber      = "pk-script-numer"
 	PkScriptNumberShort = "n"

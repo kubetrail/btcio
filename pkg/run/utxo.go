@@ -9,6 +9,8 @@ import (
 
 	"github.com/btcsuite/btcd/chaincfg/chainhash"
 	"github.com/btcsuite/btcd/rpcclient"
+	"github.com/kubetrail/bip32/pkg/keys"
+	"github.com/kubetrail/bip39/pkg/prompts"
 	"github.com/kubetrail/btcio/pkg/flags"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -21,8 +23,25 @@ func Utxo(cmd *cobra.Command, args []string) error {
 	_ = viper.BindPFlag(flags.TransactionHash, cmd.Flag(flags.TransactionHash))
 	txHash := viper.GetString(flags.TransactionHash)
 
-	if len(txHash) == 0 && len(args) > 0 {
-		txHash = args[0]
+	prompt, err := prompts.Status()
+	if err != nil {
+		return fmt.Errorf("failed to get prompt status: %w", err)
+	}
+
+	if len(txHash) == 0 {
+		if len(args) == 0 {
+			if prompt {
+				if _, err := fmt.Fprintf(cmd.OutOrStdout(), "Enter tx hash: "); err != nil {
+					return fmt.Errorf("failed to write to output: %w", err)
+				}
+			}
+			txHash, err = keys.Read(cmd.InOrStdin())
+			if err != nil {
+				return fmt.Errorf("failed to read pub addr from input: %w", err)
+			}
+		} else {
+			txHash = args[0]
+		}
 	}
 
 	connCfg := &rpcclient.ConnConfig{
@@ -67,7 +86,7 @@ func Utxo(cmd *cobra.Command, args []string) error {
 	}
 
 	switch strings.ToLower(persistentFlags.OutputFormat) {
-	case flags.OutputFormatNative, flags.OutputFormatYaml:
+	case flags.OutputFormatYaml:
 		b, err := yaml.Marshal(txResults)
 		if err != nil {
 			return fmt.Errorf("failed to serialize output to yaml: %w", err)
@@ -76,7 +95,7 @@ func Utxo(cmd *cobra.Command, args []string) error {
 		if _, err := fmt.Fprint(cmd.OutOrStdout(), string(b)); err != nil {
 			return fmt.Errorf("failed to write yaml to output: %w", err)
 		}
-	case flags.OutputFormatJson:
+	case flags.OutputFormatNative, flags.OutputFormatJson:
 		b, err := json.Marshal(txResults)
 		if err != nil {
 			return fmt.Errorf("failed to serialize output to json: %w", err)

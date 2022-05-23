@@ -59,7 +59,7 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	f.String(flags.RPCEndpoint, flags.DefaultRPCEndpoint, "RPC endpoint")
+	f.String(flags.RPCEndpoint, flags.DefaultRPCEndpoint, "RPC endpoint (env: RPC_ENDPOINT)")
 	f.String(flags.RPCUser, flags.DefaultRPCUser, "RPC user")
 	f.String(flags.RPCPassword, flags.DefaultRPCPassword, "RPC password")
 	f.String(flags.OutputFormat, flags.OutputFormatNative, "Output format")
