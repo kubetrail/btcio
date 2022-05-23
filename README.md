@@ -333,4 +333,3 @@ The output is the transaction ID that can be used to verify it
 * https://medium.com/swlh/create-raw-bitcoin-transaction-and-sign-it-with-golang-96b5e10c30aa
 * https://en.bitcoin.it/wiki/Script
 * https://bitcoin.stackexchange.com/questions/96865/why-does-vout-sometimes-not-have-address
-* 
