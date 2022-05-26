@@ -95,8 +95,17 @@ func Utxo(cmd *cobra.Command, args []string) error {
 		if _, err := fmt.Fprint(cmd.OutOrStdout(), string(b)); err != nil {
 			return fmt.Errorf("failed to write yaml to output: %w", err)
 		}
-	case flags.OutputFormatNative, flags.OutputFormatJson:
+	case flags.OutputFormatJson:
 		b, err := json.Marshal(txResults)
+		if err != nil {
+			return fmt.Errorf("failed to serialize output to json: %w", err)
+		}
+
+		if _, err := fmt.Fprintln(cmd.OutOrStdout(), string(b)); err != nil {
+			return fmt.Errorf("failed to write json to output: %w", err)
+		}
+	case flags.OutputFormatNative:
+		b, err := json.MarshalIndent(txResults, "", "  ")
 		if err != nil {
 			return fmt.Errorf("failed to serialize output to json: %w", err)
 		}
