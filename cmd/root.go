@@ -30,7 +30,12 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "btcio",
 	Short: "Perform Bitcoin transactions",
-	Long:  ``,
+	Long: `This is a tool that works as a client to the
+Bitcoin node and allows you to inspect blocks and transactions.
+
+Furthermore, once UTXO is known, a transaction can be sent
+using your private WIF key
+`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -59,7 +64,7 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	f.String(flags.RPCEndpoint, flags.DefaultRPCEndpoint, "RPC endpoint (env: RPC_ENDPOINT)")
+	f.String(flags.RPCEndpoint, flags.DefaultRPCEndpoint, "RPC endpoint (env: BTCIO_RPC_ENDPOINT)")
 	f.String(flags.RPCUser, flags.DefaultRPCUser, "RPC user")
 	f.String(flags.RPCPassword, flags.DefaultRPCPassword, "RPC password")
 	f.String(flags.OutputFormat, flags.OutputFormatNative, "Output format")
