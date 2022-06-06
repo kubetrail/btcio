@@ -6,8 +6,8 @@ require (
 	github.com/btcsuite/btcd v0.22.1
 	github.com/btcsuite/btcd/chaincfg/chainhash v1.0.1
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
-	github.com/kubetrail/bip32 v0.0.0-20220506185448-dcf51ab1c4de
-	github.com/kubetrail/bip39 v0.0.0-20220516135634-ec71756dfce4
+	github.com/kubetrail/bip32 v0.0.0-20220602131700-7af44dd3338a
+	github.com/kubetrail/bip39 v0.0.0-20220531163013-fd599ff6b558
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.12.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -35,6 +35,6 @@ require (
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
-	gopkg.in/ini.v1 v1.66.5 // indirect
+	gopkg.in/ini.v1 v1.66.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

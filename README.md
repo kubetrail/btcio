@@ -333,3 +333,6 @@ The output is the transaction ID that can be used to verify it
 * https://medium.com/swlh/create-raw-bitcoin-transaction-and-sign-it-with-golang-96b5e10c30aa
 * https://en.bitcoin.it/wiki/Script
 * https://bitcoin.stackexchange.com/questions/96865/why-does-vout-sometimes-not-have-address
+* [Types of Bitcoin transactions - Part I](https://blog.susanka.eu/types-of-bitcoin-transactions-part-i/)
+* [what-the-heck-is-utxo](https://medium.com/bitbees/what-the-heck-is-utxo-ca68f2651819)
+* [types-of-bitcoin-transactions-part-i](https://blog.susanka.eu/types-of-bitcoin-transactions-part-i/)
